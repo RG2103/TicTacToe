@@ -12,6 +12,7 @@ public class Games {
     private Deque<Player> players = new ArrayDeque<>();
     private Rules rules;
     private boolean gameOver;
+    private Deque<IObserver> observers = new ArrayDeque<>();
     private static Map<Integer, RowCol> pos = Map.of(1, new RowCol(0,0)
             ,2, new RowCol(0,1)
             ,3, new RowCol(0,2)
@@ -31,11 +32,21 @@ public class Games {
         players.add(player);
     }
 
+    public void addObserver(IObserver observer){
+        observers.add(observer);
+    }
+
+    public void notify(String msg){
+        for(IObserver observer : observers){
+            observer.update(msg);
+        }
+    }
+
     public void play(){
         Scanner sc = new Scanner(System.in);
         while (!gameOver){
             Player currentPlayer = players.peek();
-            System.out.println("Its " + currentPlayer.getName() +"'s turn. Enter position");
+            notify("Its " + currentPlayer.getName() +"'s turn. Enter position");
             int position = sc.nextInt();
             RowCol rowCol = pos.get(position);
             int row = rowCol.getRow();
@@ -44,12 +55,12 @@ public class Games {
                 board.placeMark(row, col, currentPlayer.getSymbol());
                 if (rules.checkWin(board, currentPlayer.getSymbol())){
                     board.display();
-                    System.out.println(currentPlayer.getName() + " wins!!!");
+                    notify(currentPlayer.getName() + " wins!!!");
                     currentPlayer.incrementScore();
                     gameOver=true;
                 } else if(rules.checkDraw(board, currentPlayer.getSymbol())){
                     board.display();
-                    System.out.println("Its a draw!!!");
+                    notify("Its a draw!!!");
                     gameOver=true;
                 } else{
                     board.placeMark(row,col,currentPlayer.getSymbol());
@@ -58,7 +69,7 @@ public class Games {
                     board.display();
                 }
             } else{
-                System.out.println("Invalid move. Please try again");
+                notify("Invalid move. Please try again");
                 continue;
             }
 

@@ -24,6 +24,8 @@ public class PlayGame {
             Player player2=new Player(2, name2, new Symbol(symbol2));
             game.addPlayers(player1);
             game.addPlayers(player2);
+            IObserver notifier = new ConsoleNotifier();
+            game.addObserver(notifier);
             game.play();
         } else {
             System.out.println("Invalid board size");
